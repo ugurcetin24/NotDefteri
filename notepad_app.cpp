@@ -4,7 +4,6 @@
 #include <string>
 #include <ctime>
 
-
 class Note {
 private:
     std::string title;
@@ -12,7 +11,7 @@ private:
     std::string timestamp;
 
 public:
-    // Yapıcı fonksiyon
+    // Yapici fonksiyon
     Note(const std::string& title, const std::string& content)
         : title(title), content(content) {
         // Zaman damgasını oluştur
@@ -24,16 +23,16 @@ public:
         timestamp = buffer;
     }
 
-    // Getter metodları
+    // Getter metodlari
     std::string getTitle() const { return title; }
     std::string getContent() const { return content; }
     std::string getTimestamp() const { return timestamp; }
 
-    // Notu formatlı göstermek için
+    // Notu formatli gostermek icin
     void display() const {
         std::cout << "\n===================================\n";
-        std::cout << "Baslık: " << title << "\n";
-        std::cout << "Olusturulma Zamanı: " << timestamp << "\n";
+        std::cout << "Baslik: " << title << "\n";
+        std::cout << "Olusturulma Zamani: " << timestamp << "\n";
         std::cout << "-----------------------------------\n";
         std::cout << content << "\n";
         std::cout << "===================================\n";
@@ -59,7 +58,7 @@ public:
         std::cin.ignore();
         std::getline(std::cin, title);
 
-        std::cout << "Not icerigini girin (bitirmek için bos satır girin):\n";
+        std::cout << "Not icerigini girin (bitirmek icin bos satir girin):\n";
         while (std::getline(std::cin, line) && !line.empty()) {
             content += line + "\n";
         }
@@ -71,7 +70,7 @@ public:
         std::cout << "Not basariyla kaydedildi.\n";
     }
 
-    // Tüm notları listele
+    // Tum notlari listele
     void listNotes() const {
         if (notes.empty()) {
             std::cout << "Henuz hic not eklenmemis.\n";
@@ -85,7 +84,7 @@ public:
         }
     }
 
-    // Belirli bir notu görüntüle
+    // Belirli bir notu goruntule
     void viewNote() const {
         listNotes();
 
@@ -94,7 +93,7 @@ public:
         }
 
         int index;
-        std::cout << "\nGoruntulemek istediginiz notun numarasini girin: ";
+        std::cout << "\nGoruntülemek istediginiz notun numarasini girin: ";
         std::cin >> index;
 
         if (index < 1 || index > static_cast<int>(notes.size())) {
@@ -125,7 +124,69 @@ public:
         notes.erase(notes.begin() + index - 1);
         saveNotes();
 
-        std::cout << "Not basarıyla silindi.\n";
+        std::cout << "Not basariyla silindi.\n";
+    }
+
+    // Not duzenle
+    void editNote() {
+        listNotes();
+
+        if (notes.empty()) {
+            return;
+        }
+
+        int index;
+        std::cout << "\nDuzenlemek istediginiz notun numarasini girin: ";
+        std::cin >> index;
+
+        if (index < 1 || index > static_cast<int>(notes.size())) {
+            std::cout << "Gecersiz not numarasi!\n";
+            return;
+        }
+
+        // Mevcut notu goster
+        std::cout << "\nMevcut Not:\n";
+        notes[index - 1].display();
+
+        // Duzenleme secenekleri
+        int choice;
+        std::cout << "\nNeyi duzenlemek istiyorsunuz?\n";
+        std::cout << "1. Baslik\n";
+        std::cout << "2. Icerik\n";
+        std::cout << "3. Her ikisi de\n";
+        std::cout << "0. Iptal\n";
+        std::cout << "Seciminiz: ";
+        std::cin >> choice;
+
+        if (choice == 0) {
+            return;
+        }
+
+        std::string newTitle = notes[index - 1].getTitle();
+        std::string newContent = notes[index - 1].getContent();
+        std::string line;
+
+        if (choice == 1 || choice == 3) {
+            std::cout << "Yeni baslik: ";
+            std::cin.ignore();
+            std::getline(std::cin, newTitle);
+        }
+
+        if (choice == 2 || choice == 3) {
+            std::cout << "Yeni icerik (bitirmek icin bos satir girin):\n";
+            newContent = "";
+            std::cin.ignore();
+            while (std::getline(std::cin, line) && !line.empty()) {
+                newContent += line + "\n";
+            }
+        }
+
+        // Yeni not olustur ve eskisinin yerine koy
+        Note updatedNote(newTitle, newContent);
+        notes[index - 1] = updatedNote;
+        saveNotes();
+
+        std::cout << "Not basariyla duzenlendi.\n";
     }
 
     // Arama yap
@@ -155,7 +216,7 @@ public:
         }
 
         int index;
-        std::cout << "\nGoruntulemek istediginiz sonucun numarasını girin (İptal icin 0): ";
+        std::cout << "\nGoruntülemek istediginiz sonucun numarasini girin (Iptal icin 0): ";
         std::cin >> index;
 
         if (index >= 1 && index <= static_cast<int>(results.size())) {
@@ -225,7 +286,8 @@ void displayMenu() {
     std::cout << "2. Notlari Listele\n";
     std::cout << "3. Not Goruntule\n";
     std::cout << "4. Not Sil\n";
-    std::cout << "5. Notlarda Ara\n";
+    std::cout << "5. Not Duzenle\n";
+    std::cout << "6. Notlarda Ara\n";
     std::cout << "0. Cikis\n";
     std::cout << "Seciminiz: ";
 }
@@ -254,13 +316,16 @@ int main() {
             notepad.deleteNote();
             break;
         case 5:
+            notepad.editNote();
+            break;
+        case 6:
             notepad.searchNotes();
             break;
         case 0:
-            std::cout << "Uygulama kapatılıyor...\n";
+            std::cout << "Uygulama kapatiliyor...\n";
             break;
         default:
-            std::cout << "Gecersiz secim! Lütfen tekrar deneyin.\n";
+            std::cout << "Gecersiz secim! Lutfen tekrar deneyin.\n";
         }
     } while (choice != 0);
 
